@@ -1,21 +1,13 @@
 extern crate clap;
-extern crate serde_json;
-extern crate shellexpand;
+
+#[macro_use]
+extern crate serde_derive;
+
+mod config;
+mod types;
 
 use clap::{Arg, App};
-use std::fs::{File, canonicalize};
-use std::path::PathBuf;
-use std::io::prelude::*;
-
-fn read_config_file(path: &str) -> String {
-    let expanded_path = PathBuf::from(shellexpand::tilde(path).to_string());
-    let mut f = File::open(expanded_path)
-        .expect("Could not open config file.");
-    let mut contents = String::new();
-    f.read_to_string(&mut contents)
-        .expect("Could not read config file.");
-    contents
-}
+use config::read_config_file;
 
 fn main() {
     let matches = App::new("pears")
@@ -29,6 +21,6 @@ fn main() {
                                .takes_value(true)
                                .default_value("~/.config/pears/pears.json"))
                           .get_matches();
-    let config = read_config_file(matches.value_of("config").unwrap());
-    println!("{}", config);
+    let config = read_config_file(matches.value_of("config").unwrap())
+        .expect("Could not parse config file.");
 }
