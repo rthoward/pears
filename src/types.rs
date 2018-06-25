@@ -1,12 +1,12 @@
 #[derive(Deserialize)]
 pub struct Repo {
-    owner: String,
-    name: String
+    pub owner: String,
+    pub name: String,
 }
 
 #[derive(Deserialize)]
 pub struct Config {
-    me: String,
-    token: String,
-    repos: Vec<Repo>
+    pub me: String,
+    pub token: String,
+    pub repos: Vec<Repo>,
 }
