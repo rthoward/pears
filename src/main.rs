@@ -29,6 +29,14 @@ fn main() {
     let config = read_config_file(matches.value_of("config").unwrap())
         .expect("Could not parse config file.");
 
-    let repo = &config.repos[2];
-    let _prs = fetch_prs(repo).expect("Could not reach GitHub API.");
+    for repo in config.repos {
+        println!("{}", repo.name);
+        println!("");
+
+        let prs = fetch_prs(&repo).expect("Could not reach GitHub API.");
+
+        for pr in prs {
+            println!("{}", pr.title)
+        }
+    }
 }
