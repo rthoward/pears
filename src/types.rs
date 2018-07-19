@@ -33,12 +33,13 @@ pub struct GitHubCommit {
 
 #[derive(Deserialize, Debug)]
 pub struct GitHubPullRequest {
-    pub url: String,
     pub id: i32,
     pub state: String,
     pub title: String,
     pub body: Option<String>,
     pub number: i32,
+    pub url: String,
+    pub html_url: String,
     pub created_at: String,
     pub updated_at: String,
     pub closed_at: Option<String>,

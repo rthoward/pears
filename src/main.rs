@@ -6,10 +6,12 @@ extern crate serde_derive;
 mod config;
 mod types;
 mod github;
+mod term;
 
 use clap::{App, Arg};
 use config::read_config_file;
 use github::fetch_prs;
+use term::{display_pr, display_repo};
 
 
 fn main() {
@@ -30,13 +32,11 @@ fn main() {
         .expect("Could not parse config file.");
 
     for repo in config.repos {
-        println!("{}", repo.name);
-        println!("");
-
+        display_repo(&repo);
         let prs = fetch_prs(&repo).expect("Could not reach GitHub API.");
 
         for pr in prs {
-            println!("{}", pr.title)
+            display_pr(&pr);
         }
     }
 }
