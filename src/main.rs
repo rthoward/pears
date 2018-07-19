@@ -30,5 +30,5 @@ fn main() {
         .expect("Could not parse config file.");
 
     let repo = &config.repos[2];
-    let prs = fetch_prs(repo).expect("Could not reach GitHub API.");
+    let _prs = fetch_prs(repo).expect("Could not reach GitHub API.");
 }
