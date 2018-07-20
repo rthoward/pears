@@ -32,8 +32,11 @@ fn main() {
         .expect("Could not parse config file.");
 
     for repo in config.repos {
-        display_repo(&repo);
         let prs = fetch_prs(&repo).expect("Could not reach GitHub API.");
+
+        if !prs.is_empty() {
+            display_repo(&repo);
+        }
 
         for pr in prs {
             display_pr(&pr);
