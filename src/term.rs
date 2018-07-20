@@ -7,6 +7,6 @@ pub fn display_repo(repo: &types::ConfigRepo) {
 }
 
 pub fn display_pr(pr: &types::GitHubPullRequest) {
-    println!("{}", pr.title);
-    println!("{}", pr.html_url);
+    println!("   {}", pr.title);
+    println!("   {}\n", pr.html_url);
 }
