@@ -7,7 +7,6 @@ use self::reqwest::Url;
 use types::ConfigRepo;
 use types::GitHubPullRequest;
 
-
 pub fn fetch_prs(repo: &ConfigRepo) -> Result<Vec<GitHubPullRequest>, Box<Error>> {
     let github_response = make_github_request(repo)?;
     let prs = parse_prs_response(github_response)?;
@@ -34,7 +33,7 @@ fn make_github_request(repo: &ConfigRepo) -> Result<String, reqwest::Error> {
 
 #[cfg(test)]
 mod tests {
-    use super::{parse_prs_response};
+    use super::parse_prs_response;
 
     fn make_sample_request() -> String {
         let s = r#"

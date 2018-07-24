@@ -45,5 +45,5 @@ pub struct GitHubPullRequest {
     pub closed_at: Option<String>,
     pub merged_at: Option<String>,
 
-    pub user: GitHubUser
+    pub user: GitHubUser,
 }
