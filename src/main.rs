@@ -5,14 +5,14 @@ extern crate console;
 extern crate serde_derive;
 
 mod config;
+mod display;
 mod github;
-mod term;
 mod types;
 
 use clap::{App, Arg};
 use config::read_config_file;
+use display::PearsDisplay;
 use github::fetch_prs;
-use term::PearsDisplay;
 
 fn main() {
     let matches = App::new("pears")
