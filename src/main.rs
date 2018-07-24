@@ -1,18 +1,18 @@
 extern crate clap;
+extern crate console;
 
 #[macro_use]
 extern crate serde_derive;
 
 mod config;
-mod types;
 mod github;
 mod term;
+mod types;
 
 use clap::{App, Arg};
 use config::read_config_file;
 use github::fetch_prs;
-use term::{display_pr, display_repo};
-
+use term::PearsDisplay;
 
 fn main() {
     let matches = App::new("pears")
@@ -31,15 +31,17 @@ fn main() {
     let config = read_config_file(matches.value_of("config").unwrap())
         .expect("Could not parse config file.");
 
+    let display = PearsDisplay::new();
+
     for repo in config.repos {
         let prs = fetch_prs(&repo).expect("Could not reach GitHub API.");
 
         if !prs.is_empty() {
-            display_repo(&repo);
+            display.repo(&repo);
         }
 
         for pr in prs {
-            display_pr(&pr);
+            display.pr(&pr);
         }
     }
 }
