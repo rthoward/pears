@@ -12,7 +12,7 @@ mod types;
 use clap::{App, Arg};
 use config::read_config_file;
 use display::PearsDisplay;
-use github::fetch_prs;
+use github::{GithubAPI, GithubRESTAPI};
 
 fn main() {
     let matches = App::new("pears")
@@ -34,7 +34,8 @@ fn main() {
     let display = PearsDisplay::new();
 
     for repo in config.repos {
-        let prs = fetch_prs(&repo).expect("Could not reach GitHub API.");
+        let api = GithubRESTAPI {};
+        let prs = api.fetch_prs(&repo).expect("Could not reach GitHub API.");
 
         if !prs.is_empty() {
             display.repo(&repo);

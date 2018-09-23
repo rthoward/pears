@@ -1,16 +1,46 @@
 extern crate reqwest;
 extern crate serde_json;
 
-use std::error::Error;
+use std::error;
+use std::fmt;
 
 use self::reqwest::Url;
 use types::ConfigRepo;
 use types::GitHubPullRequest;
 
-pub fn fetch_prs(repo: &ConfigRepo) -> Result<Vec<GitHubPullRequest>, Box<Error>> {
-    let github_response = make_github_request(repo)?;
-    let prs = parse_prs_response(github_response)?;
-    Ok(prs)
+#[derive(Debug, Clone)]
+pub struct GitHubError;
+
+impl fmt::Display for GitHubError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Could not reach GitHub.")
+    }
+}
+
+impl error::Error for GitHubError {
+    fn description(&self) -> &str {
+        "Could not reach GitHub."
+    }
+
+    fn cause(&self) -> Option<&error::Error> {
+        None
+    }
+}
+
+pub trait GithubAPI {
+    fn fetch_prs(&self, repo: &ConfigRepo) -> Result<Vec<GitHubPullRequest>, GitHubError>;
+}
+
+pub struct GithubRESTAPI {}
+
+impl GithubAPI for GithubRESTAPI {
+    fn fetch_prs(&self, repo: &ConfigRepo) -> Result<Vec<GitHubPullRequest>, GitHubError> {
+        let prs = make_github_request(repo)
+            .map_err(|_| GitHubError)
+            .and_then(|resp| parse_prs_response(resp).map_err(|_| GitHubError))
+            .unwrap();
+        Ok(prs)
+    }
 }
 
 fn parse_prs_response(prs_response: String) -> Result<Vec<GitHubPullRequest>, serde_json::Error> {
