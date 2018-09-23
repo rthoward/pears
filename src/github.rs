@@ -33,9 +33,24 @@ pub trait GithubAPI {
 
 pub struct GithubRESTAPI {}
 
+impl GithubRESTAPI {
+    fn make_github_request(&self, repo: &ConfigRepo) -> Result<String, reqwest::Error> {
+        let url = format!(
+            "https://api.github.com/repos/{}/{}/pulls",
+            repo.owner, repo.name
+        );
+        let uri = Url::parse(&url).expect("Could not parse url.");
+        let response_text = reqwest::get(uri)
+            .expect("Request failed.")
+            .text()
+            .expect("Could not get json");
+        Ok(response_text)
+    }
+}
+
 impl GithubAPI for GithubRESTAPI {
     fn fetch_prs(&self, repo: &ConfigRepo) -> Result<Vec<GitHubPullRequest>, GitHubError> {
-        let prs = make_github_request(repo)
+        let prs = self.make_github_request(repo)
             .map_err(|_| GitHubError)
             .and_then(|resp| parse_prs_response(resp).map_err(|_| GitHubError))
             .unwrap();
@@ -48,28 +63,11 @@ fn parse_prs_response(prs_response: String) -> Result<Vec<GitHubPullRequest>, se
     Ok(pull_requests)
 }
 
-fn make_github_request(repo: &ConfigRepo) -> Result<String, reqwest::Error> {
-    let url = format!(
-        "https://api.github.com/repos/{}/{}/pulls",
-        repo.owner, repo.name
-    );
-    let uri = Url::parse(&url).expect("Could not parse url.");
-    let response_text = reqwest::get(uri)
-        .expect("Request failed.")
-        .text()
-        .expect("Could not get json");
-    Ok(response_text)
-}
+pub struct GitHubMockAPI;
 
-#[cfg(test)]
-mod tests {
-    use super::parse_prs_response;
-
-    fn make_sample_request() -> String {
-        let s = r#"
-        [
-    {
-        "url": "https://api.github.com/repos/dod-ccpo/atst/pulls/77",
+impl GithubAPI for GitHubMockAPI {
+    fn fetch_prs(&self, _repo: &ConfigRepo) -> Result<Vec<GitHubPullRequest>, GitHubError> {
+        let s = r#" [ { "url": "https://api.github.com/repos/dod-ccpo/atst/pulls/77",
         "id": 202279448,
         "node_id": "MDExOlB1bGxSZXF1ZXN0MjAyMjc5NDQ4",
         "html_url": "https://github.com/dod-ccpo/atst/pull/77",
@@ -442,13 +440,20 @@ mod tests {
     }
     ]
         "#;
-        String::from(s)
+        Ok(parse_prs_response(String::from(s)).unwrap())
     }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
 
     #[test]
     fn parse() {
-        let sample = make_sample_request();
-        let prs = parse_prs_response(sample).unwrap();
+        let mock_api = GitHubMockAPI {};
+        let repo = ConfigRepo { owner: String::from("me"), name: String::from("repo") };
+        let prs = mock_api.fetch_prs(&repo).unwrap();
         assert!(prs[0].title == "dev users")
     }
 
