@@ -41,7 +41,7 @@ pub struct GitHubCommit {
 
 #[derive(Deserialize, Debug)]
 pub struct GitHubLabel {
-    name: String
+    pub name: String
 }
 
 #[derive(Deserialize, Debug)]
@@ -51,13 +51,17 @@ pub struct GitHubPullRequest {
     pub title: String,
     pub body: Option<String>,
     pub number: i32,
-    pub labels: GraphqlPagination<GitHubLabel>,
     pub url: String,
+    pub mergeable: String,
+
     pub createdAt: String,
     pub updatedAt: String,
     pub closedAt: Option<String>,
     pub mergedAt: Option<String>,
+
+
     pub author: GitHubUser,
+    pub labels: GraphqlPagination<GitHubLabel>,
     pub comments: GraphqlPagination<GitHubComment>,
     pub reviews: GraphqlPagination<GitHubReview>
 }
@@ -77,7 +81,7 @@ pub struct GraphqlPagination<T> {
 }
 
 impl<T> GraphqlPagination<T> {
-    // I can't figure out IntoIter
+    // I can't figure out IntoIter :(
     pub fn as_vec(self) -> Vec<T> {
         self.edges.into_iter().map(|e| e.node).collect()
     }

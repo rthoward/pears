@@ -64,6 +64,7 @@ impl GithubAPI for GitHubMockAPI {
               "updatedAt": "2018-09-18T14:24:09Z",
               "closedAt": null,
               "mergedAt": null,
+              "mergeable": "MERGEABLE",
               "author": {
                 "login": "patricksmithdds"
               },
@@ -131,6 +132,7 @@ impl GithubAPI for GitHubMockAPI {
               "updatedAt": "2018-09-24T15:25:36Z",
               "closedAt": null,
               "mergedAt": null,
+              "mergeable": "UNKNOWN",
               "author": {
                 "login": "ddsdevon"
               },
@@ -154,132 +156,6 @@ impl GithubAPI for GitHubMockAPI {
           },
           {
             "node": {
-              "id": "MDExOlB1bGxSZXF1ZXN0MjE4MDcxMDQ2",
-              "state": "OPEN",
-              "title": "Fix regression in Projects.create",
-              "body": "A new project's creator was not being assigned a role in the project's environments.",
-              "number": 335,
-              "url": "https://github.com/dod-ccpo/atst/pull/335",
-              "createdAt": "2018-09-25T18:09:00Z",
-              "updatedAt": "2018-09-25T19:55:13Z",
-              "closedAt": null,
-              "mergedAt": null,
-              "author": {
-                "login": "richard-dds"
-              },
-              "labels": {
-                "edges": []
-              },
-              "comments": {
-                "edges": [
-                  {
-                    "node": {
-                      "id": "MDEyOklzc3VlQ29tbWVudDQyNDQ1MjI3OQ==",
-                      "bodyText": "Two things I've noticed: there isn't an owner role in ENVIRONMENT_ROLES, and when I go to update a project and add a new environment I get an error. I'm not really sure how the update project works. Seems mysterious.",
-                      "author": {
-                        "login": "montana-mil"
-                      },
-                      "createdAt": "2018-09-25T18:30:18Z",
-                      "updatedAt": "2018-09-25T18:33:45Z"
-                    }
-                  },
-                  {
-                    "node": {
-                      "id": "MDEyOklzc3VlQ29tbWVudDQyNDQ1MjYxMA==",
-                      "bodyText": "@richard-dds We may need to discuss this further -- there is no \"owner\" role in an environment, so adding that would make things inconsistent with the desired CSP roles.\nI was thinking that we can't presume to know what role the user intends for themselves, so we can refrain from adding any env role and allow them to add themselves as desired.",
-                      "author": {
-                        "login": "patricksmithdds"
-                      },
-                      "createdAt": "2018-09-25T18:31:19Z",
-                      "updatedAt": "2018-09-25T18:31:19Z"
-                    }
-                  },
-                  {
-                    "node": {
-                      "id": "MDEyOklzc3VlQ29tbWVudDQyNDQ1NjQ0MQ==",
-                      "bodyText": "@montana-mil @patricksmithdds You're both right about the owner role. The only environment role we have now is nonsense_role, since we've punted on defining them.\nThe reason we've been adding project creators to a new project's environments in the first place is so they can view the project's environments. Now I'm realizing that the workspace owner's VIEW_ENVIRONMENT_IN_APPLICATION permission will allow them to see all environments anyway.\nI don't see any issues with not adding anyone to a new project's environments, except maybe the fact that the workspace owner may be listed with no environment access on the members page. How do we feel about that?",
-                      "author": {
-                        "login": "richard-dds"
-                      },
-                      "createdAt": "2018-09-25T18:43:00Z",
-                      "updatedAt": "2018-09-25T18:44:15Z"
-                    }
-                  },
-                  {
-                    "node": {
-                      "id": "MDEyOklzc3VlQ29tbWVudDQyNDQ3NjI2MQ==",
-                      "bodyText": "I don't see any issues with not adding anyone to a new project's environments, except maybe the fact that the workspace owner may be listed with no environment access on the members page. How do we feel about that?\n\nI think that's intended behavior -- we won't add a user to the environment unless they do so explicitly.",
-                      "author": {
-                        "login": "patricksmithdds"
-                      },
-                      "createdAt": "2018-09-25T19:44:53Z",
-                      "updatedAt": "2018-09-25T19:44:53Z"
-                    }
-                  }
-                ]
-              },
-              "reviews": {
-                "edges": [
-                  {
-                    "node": {
-                      "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MTU4Njc5Mjg4",
-                      "author": {
-                        "login": "montana-mil"
-                      },
-                      "createdAt": "2018-09-25T18:20:05Z",
-                      "updatedAt": "2018-09-25T18:20:06Z",
-                      "bodyText": "",
-                      "comments": {
-                        "edges": [
-                          {
-                            "node": {
-                              "author": {
-                                "login": "montana-mil"
-                              },
-                              "id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDIyMDMwMjA4MA==",
-                              "bodyText": "why did you take this out?",
-                              "diffHunk": "@@ -21,18 +21,20 @@ def create(cls, project, name):\n \n     @classmethod\n     def create_many(cls, project, names):\n+        environments = []\n         for name in names:\n             environment = Environment(project=project, name=name)\n-            db.session.add(environment)\n+            environments.append(environment)\n+\n+        db.session.add_all(environments)\n+        return environments\n \n     @classmethod\n     def add_member(cls, environment, user, role):\n         environment_user = EnvironmentRole(\n             user=user, environment=environment, role=role\n         )\n         db.session.add(environment_user)\n-        db.session.commit()",
-                              "createdAt": "2018-09-25T18:20:06Z",
-                              "updatedAt": "2018-09-25T19:55:13Z"
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  },
-                  {
-                    "node": {
-                      "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MTU4Njg1MjA1",
-                      "author": {
-                        "login": "richard-dds"
-                      },
-                      "createdAt": "2018-09-25T18:34:03Z",
-                      "updatedAt": "2018-09-25T18:34:03Z",
-                      "bodyText": "",
-                      "comments": {
-                        "edges": [
-                          {
-                            "node": {
-                              "author": {
-                                "login": "richard-dds"
-                              },
-                              "id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDIyMDMwNjYzNg==",
-                              "bodyText": "In the audit logs story I removed some of the commit()s from the Projects.create code path by only adding the new objects to the session and then committing them at the end of Projects.create. The benefits are that it saves us a few trips to the database, and it causes the audit events to be generated in a more readable way.\nIn doing that, I introduced this bug, but in fixing it I also realized that there were more extraneous commit()s to remove.",
-                              "diffHunk": "@@ -21,18 +21,20 @@ def create(cls, project, name):\n \n     @classmethod\n     def create_many(cls, project, names):\n+        environments = []\n         for name in names:\n             environment = Environment(project=project, name=name)\n-            db.session.add(environment)\n+            environments.append(environment)\n+\n+        db.session.add_all(environments)\n+        return environments\n \n     @classmethod\n     def add_member(cls, environment, user, role):\n         environment_user = EnvironmentRole(\n             user=user, environment=environment, role=role\n         )\n         db.session.add(environment_user)\n-        db.session.commit()",
-                              "createdAt": "2018-09-25T18:34:03Z",
-                              "updatedAt": "2018-09-25T19:55:13Z"
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "node": {
               "id": "MDExOlB1bGxSZXF1ZXN0MjE4MDczNDIw",
               "state": "OPEN",
               "title": "User profile screen",
@@ -290,6 +166,7 @@ impl GithubAPI for GitHubMockAPI {
               "updatedAt": "2018-09-25T19:46:10Z",
               "closedAt": null,
               "mergedAt": null,
+              "mergeable": "MERGEABLE",
               "author": {
                 "login": "andrewdds"
               },
@@ -342,9 +219,10 @@ impl GithubAPI for GitHubMockAPI {
               "number": 338,
               "url": "https://github.com/dod-ccpo/atst/pull/338",
               "createdAt": "2018-09-25T18:38:13Z",
-              "updatedAt": "2018-09-25T18:40:14Z",
+              "updatedAt": "2018-09-25T21:06:43Z",
               "closedAt": null,
               "mergedAt": null,
+              "mergeable": "MERGEABLE",
               "author": {
                 "login": "andrewcroce"
               },
@@ -352,7 +230,19 @@ impl GithubAPI for GitHubMockAPI {
                 "edges": []
               },
               "comments": {
-                "edges": []
+                "edges": [
+                  {
+                    "node": {
+                      "id": "MDEyOklzc3VlQ29tbWVudDQyNDUwMTYzMw==",
+                      "bodyText": "I ended up just taking the Optional() validator out altogether. The form works as expected and the tests pass. When Optional() was included (in either argument position), there were about 7 tests not passing inexplicably. @dandds and I went over this and agreed this is the best way to handle it, though it feels uncomfortable since we don't know why it works. (Or rather, why including Optional() didn't work)",
+                      "author": {
+                        "login": "montana-mil"
+                      },
+                      "createdAt": "2018-09-25T21:06:43Z",
+                      "updatedAt": "2018-09-25T21:06:43Z"
+                    }
+                  }
+                ]
               },
               "reviews": {
                 "edges": [
@@ -376,7 +266,7 @@ impl GithubAPI for GitHubMockAPI {
                               "bodyText": "While we're here, can we update the text here to indicate the letter is optional as well.",
                               "diffHunk": "@@ -121,9 +121,9 @@ def is_missing_task_order_number(self):\n     )\n \n     ba_code = StringField(\n-        \"Program Budget Activity (BA) Code\",\n+        \"Program Budget Activity (BA) Code (Optional)\",\n         description=\"BA Code is used to identify the purposes, projects, or types of activities financed by the appropriation fund. <br/><em>It should be two digits, followed by a letter.</em>\",",
                               "createdAt": "2018-09-25T18:40:13Z",
-                              "updatedAt": "2018-09-25T18:40:14Z"
+                              "updatedAt": "2018-09-25T21:04:20Z"
                             }
                           }
                         ]
@@ -384,6 +274,101 @@ impl GithubAPI for GitHubMockAPI {
                     }
                   }
                 ]
+              }
+            }
+          },
+          {
+            "node": {
+              "id": "MDExOlB1bGxSZXF1ZXN0MjE4MTA2MjMy",
+              "state": "OPEN",
+              "title": "Hook up the \"Add Environment Access\" link when adding a member",
+              "body": "After adding a member to a workspace, an alert is shown with a link to add environment access that previously did nothing. Now, it will link to the edit workspace member page:\r\n\r\n![image](https://user-images.githubusercontent.com/40774582/46040579-b367d800-c0de-11e8-9e58-aa95eef2c60b.png)\r\n",
+              "number": 339,
+              "url": "https://github.com/dod-ccpo/atst/pull/339",
+              "createdAt": "2018-09-25T20:19:09Z",
+              "updatedAt": "2018-09-25T21:01:58Z",
+              "closedAt": null,
+              "mergedAt": null,
+              "mergeable": "MERGEABLE",
+              "author": {
+                "login": "patricksmithdds"
+              },
+              "labels": {
+                "edges": []
+              },
+              "comments": {
+                "edges": [
+                  {
+                    "node": {
+                      "id": "MDEyOklzc3VlQ29tbWVudDQyNDQ5NjU5OQ==",
+                      "bodyText": "@dandds I had to fix some code formatting issues, so could you please re-review at your leisure?",
+                      "author": {
+                        "login": "patricksmithdds"
+                      },
+                      "createdAt": "2018-09-25T20:49:41Z",
+                      "updatedAt": "2018-09-25T20:49:41Z"
+                    }
+                  }
+                ]
+              },
+              "reviews": {
+                "edges": [
+                  {
+                    "node": {
+                      "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MTU4NzI4NjEz",
+                      "author": {
+                        "login": "dandds"
+                      },
+                      "createdAt": "2018-09-25T20:24:08Z",
+                      "updatedAt": "2018-09-25T20:40:18Z",
+                      "bodyText": "nice",
+                      "comments": {
+                        "edges": []
+                      }
+                    }
+                  },
+                  {
+                    "node": {
+                      "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3MTU4NzQzODAz",
+                      "author": {
+                        "login": "dandds"
+                      },
+                      "createdAt": "2018-09-25T21:01:58Z",
+                      "updatedAt": "2018-09-25T21:01:58Z",
+                      "bodyText": "",
+                      "comments": {
+                        "edges": []
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "node": {
+              "id": "MDExOlB1bGxSZXF1ZXN0MjE4MTEyNTg3",
+              "state": "OPEN",
+              "title": "Help Content",
+              "body": "Begin adding content for the help document:\r\nhttps://docs.google.com/document/d/1Y6RbHd0YMwDpxxowP07MvJvkfvxhsAgmKiYNjoVm9bo/edit#/\r\n\r\nContent is not final. Some work still needs to get done to handle overflowing tables.\r\n\r\n![screencapture-localhost-8000-help-2018-09-25-16_29_33](https://user-images.githubusercontent.com/38014252/46041275-5d942f80-c0e0-11e8-84eb-aa078ea26007.png)\r\n",
+              "number": 340,
+              "url": "https://github.com/dod-ccpo/atst/pull/340",
+              "createdAt": "2018-09-25T20:41:46Z",
+              "updatedAt": "2018-09-25T20:41:47Z",
+              "closedAt": null,
+              "mergedAt": null,
+              "mergeable": "MERGEABLE",
+              "author": {
+                "login": "luisgov"
+              },
+              "labels": {
+                "edges": []
+              },
+              "comments": {
+                "edges": []
+              },
+              "reviews": {
+                "edges": []
               }
             }
           }
