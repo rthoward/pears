@@ -35,7 +35,8 @@ fn main() {
 
     for repo in config.repos {
         let api = GithubRESTAPI {};
-        let prs = api.fetch_prs(&repo).expect("Could not reach GitHub API.");
+        let mut prs = api.fetch_prs(&repo).expect("Could not reach GitHub API.");
+        prs.sort_by(|a, b| a.updated_at.cmp(&b.updated_at));
 
         if !prs.is_empty() {
             display.repo(&repo);
