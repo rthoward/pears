@@ -38,14 +38,14 @@ fn main() {
 
         let repo = api.fetch_repo(&config_repo).expect("Could not reach GitHub API.");
         let mut prs = repo.pullRequests.as_vec();
-        prs.sort_by(|a, b| a.updatedAt.cmp(&b.updatedAt));
+        prs.sort_by(|a, b| b.updatedAt.cmp(&a.updatedAt));
 
         if !prs.is_empty() {
             display.repo(&config_repo);
         }
 
         for pr in prs {
-            display.pr(&pr);
+            display.pr(pr);
         }
     }
 }
