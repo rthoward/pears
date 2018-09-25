@@ -30,7 +30,7 @@ impl PearsDisplay {
     pub fn pr(&self, pr: &types::GitHubPullRequest) {
         let line = format!(
             "   {}\n   Last updated {}\n   {}\n",
-            pr.title, pr.updated_at, pr.html_url
+            pr.title, pr.updatedAt, pr.url
         );
         self.term.write_line(line.as_str()).unwrap();
     }

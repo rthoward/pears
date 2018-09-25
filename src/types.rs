@@ -12,16 +12,24 @@ pub struct Config {
 }
 
 #[derive(Deserialize, Debug)]
+pub struct GitHubGraphQLResponse {
+    pub data: GitHubGraphQLRepoResponse,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct GitHubGraphQLRepoResponse {
+    pub repository: GitHubRepo,
+}
+
+#[derive(Deserialize, Debug)]
 pub struct GitHubRepo {
-    pub owner: String,
     pub name: String,
-    pub id: i32,
+    pub pullRequests: GraphqlPagination<GitHubPullRequest>,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct GitHubUser {
     pub login: String,
-    pub id: i32,
 }
 
 #[derive(Deserialize, Debug)]
@@ -32,18 +40,58 @@ pub struct GitHubCommit {
 }
 
 #[derive(Deserialize, Debug)]
+pub struct GitHubLabel {
+    name: String
+}
+
+#[derive(Deserialize, Debug)]
 pub struct GitHubPullRequest {
-    pub id: i32,
+    pub id: String,
     pub state: String,
     pub title: String,
     pub body: Option<String>,
     pub number: i32,
+    pub labels: GraphqlPagination<GitHubLabel>,
     pub url: String,
-    pub html_url: String,
-    pub created_at: String,
-    pub updated_at: String,
-    pub closed_at: Option<String>,
-    pub merged_at: Option<String>,
+    pub createdAt: String,
+    pub updatedAt: String,
+    pub closedAt: Option<String>,
+    pub mergedAt: Option<String>,
+    pub author: GitHubUser,
+    pub comments: GraphqlPagination<GitHubComment>,
+    pub reviews: GraphqlPagination<GitHubReview>
+}
 
-    pub user: GitHubUser,
+#[derive(Deserialize, Debug)]
+pub struct GitHubReview {
+    pub createdAt: String,
+    pub updatedAt: String,
+    pub author: GitHubUser,
+    pub bodyText: String,
+    pub comments: GraphqlPagination<GitHubComment>
+}
+
+#[derive(Deserialize, Debug)]
+pub struct GraphqlPagination<T> {
+    pub edges: Vec<GraphqlPaginationNode<T>>,
+}
+
+impl<T> GraphqlPagination<T> {
+    // I can't figure out IntoIter
+    pub fn as_vec(self) -> Vec<T> {
+        self.edges.into_iter().map(|e| e.node).collect()
+    }
+}
+
+#[derive(Deserialize, Debug)]
+pub struct GraphqlPaginationNode<T> {
+    pub node: T
+}
+
+#[derive(Deserialize, Debug)]
+pub struct GitHubComment {
+    pub createdAt: String,
+    pub updatedAt: String,
+    pub author: GitHubUser,
+    pub bodyText: String
 }

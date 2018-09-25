@@ -12,7 +12,7 @@ mod types;
 use clap::{App, Arg};
 use config::read_config_file;
 use display::PearsDisplay;
-use github::{GithubAPI, GithubRESTAPI};
+use github::{GitHubMockAPI, GithubAPI};
 
 fn main() {
     let matches = App::new("pears")
@@ -33,13 +33,15 @@ fn main() {
 
     let display = PearsDisplay::new();
 
-    for repo in config.repos {
-        let api = GithubRESTAPI {};
-        let mut prs = api.fetch_prs(&repo).expect("Could not reach GitHub API.");
-        prs.sort_by(|a, b| a.updated_at.cmp(&b.updated_at));
+    for config_repo in config.repos {
+        let api = GitHubMockAPI {};
+
+        let repo = api.fetch_repo(&config_repo).expect("Could not reach GitHub API.");
+        let mut prs = repo.pullRequests.as_vec();
+        prs.sort_by(|a, b| a.updatedAt.cmp(&b.updatedAt));
 
         if !prs.is_empty() {
-            display.repo(&repo);
+            display.repo(&config_repo);
         }
 
         for pr in prs {
