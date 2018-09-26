@@ -13,4 +13,3 @@ shellexpand = "1.0.0"
 slog = "2.2.3"
 console = "0.6.1"
 chrono = { version = "0.4", features = ["serde"] }
-humantime = "1.1.1"
