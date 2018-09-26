@@ -1,5 +1,7 @@
 extern crate clap;
 extern crate console;
+extern crate chrono;
+extern crate serde;
 
 #[macro_use]
 extern crate serde_derive;
@@ -37,12 +39,8 @@ fn main() {
         let api = GitHubMockAPI {};
 
         let repo = api.fetch_repo(&config_repo).expect("Could not reach GitHub API.");
-        let mut prs = repo.pullRequests.as_vec();
-        prs.sort_by(|a, b| b.updatedAt.cmp(&a.updatedAt));
-
-        if !prs.is_empty() {
-            display.repo(&config_repo);
-        }
+        let mut prs = repo.pull_requests.as_vec();
+        prs.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
 
         for pr in prs {
             display.pr(pr);

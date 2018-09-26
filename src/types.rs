@@ -1,3 +1,5 @@
+use chrono::{DateTime, Utc};
+
 #[derive(Deserialize, Debug)]
 pub struct ConfigRepo {
     pub owner: String,
@@ -22,9 +24,10 @@ pub struct GitHubGraphQLRepoResponse {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct GitHubRepo {
     pub name: String,
-    pub pullRequests: GraphqlPagination<GitHubPullRequest>,
+    pub pull_requests: GraphqlPagination<GitHubPullRequest>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -45,6 +48,7 @@ pub struct GitHubLabel {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct GitHubPullRequest {
     pub id: String,
     pub state: String,
@@ -54,10 +58,10 @@ pub struct GitHubPullRequest {
     pub url: String,
     pub mergeable: String,
 
-    pub createdAt: String,
-    pub updatedAt: String,
-    pub closedAt: Option<String>,
-    pub mergedAt: Option<String>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub closed_at: Option<DateTime<Utc>>,
+    pub merged_at: Option<DateTime<Utc>>,
 
 
     pub author: GitHubUser,
@@ -67,12 +71,14 @@ pub struct GitHubPullRequest {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct GitHubReview {
-    pub createdAt: String,
-    pub updatedAt: String,
     pub author: GitHubUser,
-    pub bodyText: String,
-    pub comments: GraphqlPagination<GitHubComment>
+    pub body_text: String,
+    pub comments: GraphqlPagination<GitHubComment>,
+
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -93,9 +99,11 @@ pub struct GraphqlPaginationNode<T> {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct GitHubComment {
-    pub createdAt: String,
-    pub updatedAt: String,
     pub author: GitHubUser,
-    pub bodyText: String
+    pub body_text: String,
+
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }

@@ -1,10 +1,16 @@
-use console::{Color, Style, Term};
 use types;
+
+use console::{Color, Style, Term, Attribute};
 
 pub struct PearsDisplay {
     term: Term,
     width: usize,
 }
+
+// fn ago(timestamp_str: String) {
+//     let timestamp = DateTime::parse_from_str(timestamp_str);
+//     let now = Local::now();
+// }
 
 impl PearsDisplay {
     pub fn new() -> PearsDisplay {
@@ -28,10 +34,12 @@ impl PearsDisplay {
     }
 
     pub fn pr(&self, pr: types::GitHubPullRequest) {
+        let url_style = Style::new().attr(Attribute::Dim);
         let line = format!(
             "   [#{}] {}\n   Last updated {}\n   {}\n",
-            pr.number, pr.title, pr.updatedAt, pr.url
+            pr.number, pr.title, pr.updated_at, url_style.apply_to(pr.url)
         );
         self.term.write_line(line.as_str()).unwrap();
     }
+
 }
