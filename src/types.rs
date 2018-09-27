@@ -63,11 +63,16 @@ pub struct GitHubPullRequest {
     pub closed_at: Option<DateTime<Utc>>,
     pub merged_at: Option<DateTime<Utc>>,
 
-
     pub author: GitHubUser,
     pub labels: GraphqlPagination<GitHubLabel>,
     pub comments: GraphqlPagination<GitHubComment>,
     pub reviews: GraphqlPagination<GitHubReview>
+}
+
+impl GitHubPullRequest {
+    pub fn is_approved(&self) -> bool {
+        true
+    }
 }
 
 #[derive(Deserialize, Debug)]

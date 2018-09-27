@@ -60,10 +60,11 @@ impl PearsDisplay {
 
     pub fn pr(&self, pr: types::GitHubPullRequest) {
         let url_style = Style::new().attr(Attribute::Dim);
+        let approved = if pr.is_approved() { "✅" } else { "" };
 
         let line = format!(
-            "   [#{}] {}\n   Updated {} ago\n   {}\n",
-            pr.number, pr.title, ago(pr.updated_at), url_style.apply_to(pr.url)
+            "{}   [#{}] {}\n   Updated {} ago\n   {}\n",
+            approved, pr.number, pr.title, ago(pr.updated_at), url_style.apply_to(pr.url)
         );
         self.term.write_line(line.as_str()).unwrap();
     }
