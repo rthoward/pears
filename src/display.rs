@@ -1,7 +1,7 @@
 use types;
 
-use console::{Color, Style, Term, Attribute};
 use chrono::prelude::*;
+use console::{Attribute, Color, Style, Term};
 
 pub struct PearsDisplay {
     term: Term,
@@ -64,9 +64,12 @@ impl PearsDisplay {
 
         let line = format!(
             "{}   [#{}] {}\n   Updated {} ago\n   {}\n",
-            approved, pr.number, pr.title, ago(pr.updated_at), url_style.apply_to(pr.url)
+            approved,
+            pr.number,
+            pr.title,
+            ago(pr.updated_at),
+            url_style.apply_to(pr.url)
         );
         self.term.write_line(line.as_str()).unwrap();
     }
-
 }

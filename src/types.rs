@@ -44,7 +44,7 @@ pub struct GitHubCommit {
 
 #[derive(Deserialize, Debug)]
 pub struct GitHubLabel {
-    pub name: String
+    pub name: String,
 }
 
 #[derive(Deserialize, Debug)]
@@ -66,7 +66,7 @@ pub struct GitHubPullRequest {
     pub author: GitHubUser,
     pub labels: GraphqlPagination<GitHubLabel>,
     pub comments: GraphqlPagination<GitHubComment>,
-    pub reviews: GraphqlPagination<GitHubReview>
+    pub reviews: GraphqlPagination<GitHubReview>,
 }
 
 impl GitHubPullRequest {
@@ -100,7 +100,7 @@ impl<T> GraphqlPagination<T> {
 
 #[derive(Deserialize, Debug)]
 pub struct GraphqlPaginationNode<T> {
-    pub node: T
+    pub node: T,
 }
 
 #[derive(Deserialize, Debug)]

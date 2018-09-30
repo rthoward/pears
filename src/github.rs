@@ -5,7 +5,7 @@ use std::error;
 use std::fmt;
 
 use types::ConfigRepo;
-use types::{GitHubPullRequest, GitHubRepo, GitHubGraphQLResponse};
+use types::{GitHubGraphQLResponse, GitHubPullRequest, GitHubRepo};
 
 #[derive(Debug, Clone)]
 pub struct GitHubError;
@@ -380,57 +380,6 @@ impl GithubAPI for GitHubMockAPI {
         "###;
         Ok(parse_repo_response(String::from(s)).unwrap())
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     fn fetch_prs(&self, _repo: &ConfigRepo) -> Result<Vec<GitHubPullRequest>, GitHubError> {
         let s = r###"
