@@ -4,9 +4,13 @@ extern crate console;
 extern crate git2;
 extern crate regex;
 extern crate serde;
+extern crate reqwest;
 
 #[macro_use]
 extern crate serde_derive;
+
+#[macro_use]
+extern crate serde_json;
 
 mod config;
 mod display;

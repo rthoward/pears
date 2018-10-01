@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Richard Howard <richard@howard.io>"]
 
 [dependencies]
-reqwest = "0.8.6"
+reqwest = "0.9.2"
 clap = "2.31.2"
 serde = "1.0.66"
 serde_json = "1.0.21"
