@@ -25,13 +25,13 @@ fn ago(timestamp: DateTime<Utc>) -> String {
         noun = if days > 1 { "days" } else { "day" };
     } else if hours > 0 {
         count = hours;
-        noun = if days > 1 { "hours" } else { "hour" };
+        noun = if hours > 1 { "hours" } else { "hour" };
     } else if minutes > 0 {
         count = minutes;
-        noun = if days > 1 { "minutes" } else { "minute" };
+        noun = if minutes > 1 { "minutes" } else { "minute" };
     } else {
         count = seconds;
-        noun = if days > 1 { "seconds" } else { "second" };
+        noun = if seconds > 1 { "seconds" } else { "second" };
     }
 
     format!("{} {}", count, noun)
