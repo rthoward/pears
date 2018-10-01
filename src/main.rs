@@ -23,7 +23,7 @@ use git::discover_repo;
 use clap::{App, Arg};
 use config::read_config_file;
 use display::PearsDisplay;
-use github::{GitHubMockAPI, GitHubGraphqlAPI, GithubAPI};
+use github::{GitHubGraphqlAPI, GithubAPI};
 
 fn main() {
     let matches = App::new("pears")
@@ -46,7 +46,7 @@ fn main() {
     let config_repo = discover_repo(cwd).expect("Could not determine repo details.");
 
     let display = PearsDisplay::new();
-    let api = GitHubMockAPI {};
+    let api = GitHubGraphqlAPI {};
 
     let repo = api.fetch_repo(config, &config_repo)
         .expect("Could not reach GitHub API.");
