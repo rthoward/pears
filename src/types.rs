@@ -1,5 +1,10 @@
 use chrono::{DateTime, Utc};
 
+#[derive(Debug, Clone)]
+pub struct GitHubError {
+    pub details: String,
+}
+
 #[derive(Deserialize, Debug)]
 pub struct ConfigRepo {
     pub owner: String,
@@ -10,7 +15,6 @@ pub struct ConfigRepo {
 pub struct Config {
     pub me: String,
     pub token: String,
-    pub repos: Vec<ConfigRepo>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -71,7 +75,7 @@ pub struct GitHubPullRequest {
 
 impl GitHubPullRequest {
     pub fn is_approved(&self) -> bool {
-        true
+        false
     }
 }
 

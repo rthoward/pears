@@ -5,7 +5,7 @@ use console::{Attribute, Color, Style, Term};
 
 pub struct PearsDisplay {
     term: Term,
-    width: usize,
+    _width: usize,
 }
 
 fn ago(timestamp: DateTime<Utc>) -> String {
@@ -44,18 +44,8 @@ impl PearsDisplay {
 
         PearsDisplay {
             term,
-            width: width as usize,
+            _width: width as usize,
         }
-    }
-
-    pub fn repo(&self, repo: &types::ConfigRepo) {
-        let repo_style = Style::new().bg(Color::White).fg(Color::Black);
-        let line = format!(
-            "{:width$}\n",
-            repo_style.apply_to(&repo.name),
-            width = self.width
-        );
-        self.term.write_line(line.as_str()).unwrap();
     }
 
     pub fn pr(&self, pr: types::GitHubPullRequest) {
