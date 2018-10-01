@@ -1,7 +1,7 @@
 use types;
 
 use chrono::prelude::*;
-use console::{Attribute, Color, Style, Term};
+use console::{Attribute, Style, Term};
 
 pub struct PearsDisplay {
     term: Term,

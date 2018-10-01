@@ -146,7 +146,7 @@ impl GithubAPI for GitHubGraphqlAPI {
 }
 
 impl GithubAPI for GitHubMockAPI {
-    fn fetch_repo(&self, _config: Config, repo: &ConfigRepo) -> Result<GitHubRepo, GitHubError> {
+    fn fetch_repo(&self, _config: Config, _repo: &ConfigRepo) -> Result<GitHubRepo, GitHubError> {
         let s = r###"
         {
 	"data": {
@@ -582,11 +582,15 @@ mod tests {
     #[test]
     fn parse() {
         let mock_api = GitHubMockAPI {};
+        let config = Config {
+            me: "Richard".to_string(),
+            token: "hello".to_string()
+        };
         let repo = ConfigRepo {
             owner: String::from("me"),
             name: String::from("repo"),
         };
-        let repo = mock_api.fetch_repo(&repo).unwrap();
+        let _repo = mock_api.fetch_repo(config, &repo).unwrap();
         assert!(true)
     }
 }
