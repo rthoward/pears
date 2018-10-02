@@ -18,12 +18,12 @@ mod git;
 mod github;
 mod types;
 
-use std::env;
-use git::discover_repo;
 use clap::{App, Arg};
 use config::read_config_file;
 use display::PearsDisplay;
+use git::{discover_repo, parse_repo_description};
 use github::{GitHubGraphqlAPI, GithubAPI};
+use std::env;
 
 fn main() {
     let matches = App::new("pears")
@@ -38,12 +38,24 @@ fn main() {
                 .takes_value(true)
                 .default_value("~/.config/pears/pears.json"),
         )
+        .arg(
+            Arg::with_name("repo")
+                .short("r")
+                .long("repo")
+                .help("Specify a repository. Format: <owner>/<repo>")
+                .takes_value(true),
+        )
         .get_matches();
 
-    let config = read_config_file(matches.value_of("config").unwrap()).expect("Could not parse config file.");
+    let config = read_config_file(matches.value_of("config").unwrap())
+        .expect("Could not parse config file.");
 
-    let cwd = env::current_dir().expect("Could not get current dir.");
-    let config_repo = discover_repo(cwd).expect("Could not determine repo details.");
+    let config_repo = if matches.is_present("repo") {
+        parse_repo_description(matches.value_of("repo").unwrap())
+    } else {
+        let cwd = env::current_dir().expect("Could not get current dir.");
+        discover_repo(cwd).expect("Could not determine repo details.")
+    };
 
     let display = PearsDisplay::new();
     let api = GitHubGraphqlAPI {};

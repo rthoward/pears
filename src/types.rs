@@ -85,6 +85,7 @@ pub struct GitHubReview {
     pub author: GitHubUser,
     pub body_text: String,
     pub comments: GraphqlPagination<GitHubComment>,
+    pub state: String,
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,

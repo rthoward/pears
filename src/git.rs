@@ -17,3 +17,13 @@ pub fn discover_repo(path: PathBuf) -> Option<ConfigRepo> {
         name: String::from(&captures["name"]),
     })
 }
+
+pub fn parse_repo_description(description: &str) -> ConfigRepo {
+    let re = Regex::new(r"(?P<owner>.*)/(?P<name>.*)").unwrap();
+    let captures = re.captures(description)
+        .expect("Could not parse repo description.");
+    ConfigRepo {
+        owner: String::from(&captures["owner"]),
+        name: String::from(&captures["name"]),
+    }
+}

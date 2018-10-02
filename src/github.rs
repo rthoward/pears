@@ -4,7 +4,7 @@ use std::error::Error;
 use std::{convert, fmt};
 
 use types::ConfigRepo;
-use types::{GitHubError, GitHubGraphQLResponse, GitHubRepo, Config};
+use types::{Config, GitHubError, GitHubGraphQLResponse, GitHubRepo};
 
 impl fmt::Display for GitHubError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -584,7 +584,7 @@ mod tests {
         let mock_api = GitHubMockAPI {};
         let config = Config {
             me: "Richard".to_string(),
-            token: "hello".to_string()
+            token: "hello".to_string(),
         };
         let repo = ConfigRepo {
             owner: String::from("me"),
