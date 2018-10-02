@@ -104,6 +104,7 @@ impl GithubAPI for GitHubGraphqlAPI {
                 createdAt
                 updatedAt
                 bodyText
+                state
                 comments(last: 100) {
                   edges {
                     node {
