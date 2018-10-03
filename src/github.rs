@@ -48,6 +48,8 @@ fn parse_repo_response(repo_response: String) -> Result<GitHubRepo, serde_json::
 }
 
 pub struct GitHubGraphqlAPI {}
+
+#[allow(dead_code)]
 pub struct GitHubMockAPI {}
 
 impl GithubAPI for GitHubGraphqlAPI {
