@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use serde::{Deserializer, Deserialize};
+use serde::{Deserialize, Deserializer};
 
 #[derive(Debug, Clone)]
 pub struct GitHubError {
@@ -113,8 +113,9 @@ pub struct Comment {
 }
 
 pub fn deserialize_pagination<'de, D, T>(deserializer: D) -> Result<Vec<T>, D::Error>
-where D: Deserializer<'de>,
-      T: Deserialize<'de>,
+where
+    D: Deserializer<'de>,
+    T: Deserialize<'de>,
 {
     #[derive(Deserialize, Debug)]
     pub struct GraphqlPagination<T> {
@@ -126,7 +127,6 @@ where D: Deserializer<'de>,
         pub node: T,
     }
 
-    GraphqlPagination::deserialize(deserializer).map(|p|
-        p.edges.into_iter().map(|e| e.node).collect()
-    )
+    GraphqlPagination::deserialize(deserializer)
+        .map(|p| p.edges.into_iter().map(|e| e.node).collect())
 }
