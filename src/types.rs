@@ -75,7 +75,7 @@ pub struct GitHubPullRequest {
 
 impl GitHubPullRequest {
     pub fn is_approved(&self) -> bool {
-        false
+        self.reviews.edges.iter().any(|e| e.node.state == "APPROVED")
     }
 }
 

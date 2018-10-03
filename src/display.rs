@@ -50,10 +50,10 @@ impl PearsDisplay {
 
     pub fn pr(&self, pr: types::GitHubPullRequest) {
         let url_style = Style::new().attr(Attribute::Dim);
-        let approved = if pr.is_approved() { "✅" } else { "" };
+        let approved = if pr.is_approved() { "✅ " } else { "   " };
 
         let line = format!(
-            "{}   [#{}] {}\n   Updated {} ago\n   {}\n",
+            "{}[#{}] {}\n   Updated {} ago\n   {}\n",
             approved,
             pr.number,
             pr.title,

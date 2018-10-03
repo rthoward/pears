@@ -239,7 +239,7 @@ impl GithubAPI for GitHubMockAPI {
                       "createdAt": "2018-09-26T15:06:31Z",
                       "updatedAt": "2018-09-26T15:11:45Z",
                       "bodyText": "",
-                      "state": "COMMENTED",
+                      "state": "APPROVED",
                       "comments": {
                         "edges": [
                           {
