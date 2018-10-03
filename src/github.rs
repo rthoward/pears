@@ -4,7 +4,7 @@ use std::error::Error;
 use std::{convert, fmt};
 
 use types::ConfigRepo;
-use types::{Config, GitHubError, GitHubGraphQLResponse, GitHubRepo};
+use types::{Config, GitHubError, GraphqlResponse, Repo};
 
 impl fmt::Display for GitHubError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -39,11 +39,11 @@ impl convert::From<serde_json::Error> for GitHubError {
 }
 
 pub trait GithubAPI {
-    fn fetch_repo(&self, config: Config, repo: &ConfigRepo) -> Result<GitHubRepo, GitHubError>;
+    fn fetch_repo(&self, config: Config, repo: &ConfigRepo) -> Result<Repo, GitHubError>;
 }
 
-fn parse_repo_response(repo_response: String) -> Result<GitHubRepo, serde_json::Error> {
-    let resp: GitHubGraphQLResponse = serde_json::from_str(&repo_response)?;
+fn parse_repo_response(repo_response: String) -> Result<Repo, serde_json::Error> {
+    let resp: GraphqlResponse = serde_json::from_str(&repo_response)?;
     Ok(resp.data.repository)
 }
 
@@ -53,7 +53,7 @@ pub struct GitHubGraphqlAPI {}
 pub struct GitHubMockAPI {}
 
 impl GithubAPI for GitHubGraphqlAPI {
-    fn fetch_repo(&self, config: Config, repo: &ConfigRepo) -> Result<GitHubRepo, GitHubError> {
+    fn fetch_repo(&self, config: Config, repo: &ConfigRepo) -> Result<Repo, GitHubError> {
         let query = r###"
         query fetchPullRequests($repo_owner: String!, $repo_name: String!) {
   repository(owner: $repo_owner, name: $repo_name) {
@@ -149,7 +149,7 @@ impl GithubAPI for GitHubGraphqlAPI {
 }
 
 impl GithubAPI for GitHubMockAPI {
-    fn fetch_repo(&self, _config: Config, _repo: &ConfigRepo) -> Result<GitHubRepo, GitHubError> {
+    fn fetch_repo(&self, _config: Config, _repo: &ConfigRepo) -> Result<Repo, GitHubError> {
         let s = r###"
         {
   "data": {

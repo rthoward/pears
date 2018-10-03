@@ -19,44 +19,44 @@ pub struct Config {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct GitHubGraphQLResponse {
-    pub data: GitHubGraphQLRepoResponse,
+pub struct GraphqlResponse {
+    pub data: RepoResponse,
 }
 
 #[derive(Deserialize, Debug)]
-pub struct GitHubGraphQLRepoResponse {
-    pub repository: GitHubRepo,
+pub struct RepoResponse {
+    pub repository: Repo,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct GitHubRepo {
+pub struct Repo {
     pub name: String,
 
     #[serde(deserialize_with = "deserialize_pagination")]
-    pub pull_requests: Vec<GitHubPullRequest>,
+    pub pull_requests: Vec<PullRequest>,
 }
 
 #[derive(Deserialize, Debug)]
-pub struct GitHubUser {
+pub struct User {
     pub login: String,
 }
 
 #[derive(Deserialize, Debug)]
-pub struct GitHubCommit {
+pub struct Commit {
     pub sha: String,
-    pub user: GitHubUser,
-    pub repo: GitHubRepo,
+    pub user: User,
+    pub repo: Repo,
 }
 
 #[derive(Deserialize, Debug)]
-pub struct GitHubLabel {
+pub struct Label {
     pub name: String,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct GitHubPullRequest {
+pub struct PullRequest {
     pub id: String,
     pub state: String,
     pub title: String,
@@ -70,19 +70,19 @@ pub struct GitHubPullRequest {
     pub closed_at: Option<DateTime<Utc>>,
     pub merged_at: Option<DateTime<Utc>>,
 
-    pub author: GitHubUser,
+    pub author: User,
 
     #[serde(deserialize_with = "deserialize_pagination")]
-    pub labels: Vec<GitHubLabel>,
+    pub labels: Vec<Label>,
 
     #[serde(deserialize_with = "deserialize_pagination")]
-    pub comments: Vec<GitHubComment>,
+    pub comments: Vec<Comment>,
 
     #[serde(deserialize_with = "deserialize_pagination")]
-    pub reviews: Vec<GitHubReview>,
+    pub reviews: Vec<Review>,
 }
 
-impl GitHubPullRequest {
+impl PullRequest {
     pub fn is_approved(&self) -> bool {
         self.reviews.iter().any(|e| e.state == "APPROVED")
     }
@@ -90,13 +90,13 @@ impl GitHubPullRequest {
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct GitHubReview {
-    pub author: GitHubUser,
+pub struct Review {
+    pub author: User,
     pub body_text: String,
     pub state: String,
 
     #[serde(deserialize_with = "deserialize_pagination")]
-    pub comments: Vec<GitHubComment>,
+    pub comments: Vec<Comment>,
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -104,8 +104,8 @@ pub struct GitHubReview {
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct GitHubComment {
-    pub author: GitHubUser,
+pub struct Comment {
+    pub author: User,
     pub body_text: String,
 
     pub created_at: DateTime<Utc>,

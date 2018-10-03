@@ -48,7 +48,7 @@ impl PearsDisplay {
         }
     }
 
-    pub fn pr(&self, pr: types::GitHubPullRequest) {
+    pub fn pr(&self, pr: types::PullRequest) {
         let url_style = Style::new().attr(Attribute::Dim);
         let approved = if pr.is_approved() { "✅ " } else { "   " };
 
