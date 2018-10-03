@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use serde::{Deserializer, Deserialize};
 
 #[derive(Debug, Clone)]
 pub struct GitHubError {
@@ -31,7 +32,9 @@ pub struct GitHubGraphQLRepoResponse {
 #[serde(rename_all = "camelCase")]
 pub struct GitHubRepo {
     pub name: String,
-    pub pull_requests: GraphqlPagination<GitHubPullRequest>,
+
+    #[serde(deserialize_with = "deserialize_pagination")]
+    pub pull_requests: Vec<GitHubPullRequest>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -68,14 +71,20 @@ pub struct GitHubPullRequest {
     pub merged_at: Option<DateTime<Utc>>,
 
     pub author: GitHubUser,
-    pub labels: GraphqlPagination<GitHubLabel>,
-    pub comments: GraphqlPagination<GitHubComment>,
-    pub reviews: GraphqlPagination<GitHubReview>,
+
+    #[serde(deserialize_with = "deserialize_pagination")]
+    pub labels: Vec<GitHubLabel>,
+
+    #[serde(deserialize_with = "deserialize_pagination")]
+    pub comments: Vec<GitHubComment>,
+
+    #[serde(deserialize_with = "deserialize_pagination")]
+    pub reviews: Vec<GitHubReview>,
 }
 
 impl GitHubPullRequest {
     pub fn is_approved(&self) -> bool {
-        self.reviews.edges.iter().any(|e| e.node.state == "APPROVED")
+        self.reviews.iter().any(|e| e.state == "APPROVED")
     }
 }
 
@@ -84,28 +93,13 @@ impl GitHubPullRequest {
 pub struct GitHubReview {
     pub author: GitHubUser,
     pub body_text: String,
-    pub comments: GraphqlPagination<GitHubComment>,
     pub state: String,
+
+    #[serde(deserialize_with = "deserialize_pagination")]
+    pub comments: Vec<GitHubComment>,
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
-}
-
-#[derive(Deserialize, Debug)]
-pub struct GraphqlPagination<T> {
-    pub edges: Vec<GraphqlPaginationNode<T>>,
-}
-
-impl<T> GraphqlPagination<T> {
-    // I can't figure out IntoIter :(
-    pub fn as_vec(self) -> Vec<T> {
-        self.edges.into_iter().map(|e| e.node).collect()
-    }
-}
-
-#[derive(Deserialize, Debug)]
-pub struct GraphqlPaginationNode<T> {
-    pub node: T,
 }
 
 #[derive(Deserialize, Debug)]
@@ -116,4 +110,23 @@ pub struct GitHubComment {
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+}
+
+pub fn deserialize_pagination<'de, D, T>(deserializer: D) -> Result<Vec<T>, D::Error>
+where D: Deserializer<'de>,
+      T: Deserialize<'de>,
+{
+    #[derive(Deserialize, Debug)]
+    pub struct GraphqlPagination<T> {
+        pub edges: Vec<GraphqlPaginationNode<T>>,
+    }
+
+    #[derive(Deserialize, Debug)]
+    pub struct GraphqlPaginationNode<T> {
+        pub node: T,
+    }
+
+    GraphqlPagination::deserialize(deserializer).map(|p|
+        p.edges.into_iter().map(|e| e.node).collect()
+    )
 }

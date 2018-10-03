@@ -62,7 +62,7 @@ fn main() {
 
     let repo = api.fetch_repo(config, &config_repo)
         .expect("Could not reach GitHub API.");
-    let mut prs = repo.pull_requests.as_vec();
+    let mut prs = repo.pull_requests;
     prs.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
 
     for pr in prs {
