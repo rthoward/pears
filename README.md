@@ -17,11 +17,5 @@ An example `pears.json` file:
     "me": "my-github-username",
     // Create one of these here: https://github.com/settings/tokens
     "token": "github-token",
-    "repos": [
-        {
-            "owner": "repo-owner",
-            "name": "repo-name"
-        },
-    ]
 }
 ```
