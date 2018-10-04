@@ -3,6 +3,7 @@ name = "pears"
 version = "0.1.0"
 authors = ["Richard Howard <richard@howard.io>"]
 description = "A simple tool for viewing open pull requests."
+license = "MIT"
 
 [dependencies]
 reqwest = "0.9.2"
