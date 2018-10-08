@@ -136,7 +136,8 @@ impl GithubAPI for GitHubGraphqlAPI {
                "repo_owner": repo.owner,
                "repo_name": repo.name,
            }
-        }).to_string();
+        })
+        .to_string();
         let mut response = reqwest::Client::new()
             .post("https://api.github.com/graphql")
             .bearer_auth(config.token.to_owned())

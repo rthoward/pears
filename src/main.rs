@@ -27,15 +27,15 @@ use std::env;
 use types::{Config, ConfigRepo};
 
 fn list<T: GithubAPI>(config: &Config, config_repo: &ConfigRepo, api: T, display: PearsDisplay) {
-        let repo = api.fetch_repo(config, &config_repo)
-            .expect("Could not reach GitHub API.");
-        let mut prs = repo.pull_requests;
-        prs.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
+    let repo = api
+        .fetch_repo(config, &config_repo)
+        .expect("Could not reach GitHub API.");
+    let mut prs = repo.pull_requests;
+    prs.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
 
-        for pr in prs {
-            display.pr(pr);
-        }
-
+    for pr in prs {
+        display.pr(pr);
+    }
 }
 
 fn main() {
@@ -58,8 +58,7 @@ fn main() {
                 .help("Specify a repository. Format: <owner>/<repo>")
                 .takes_value(true),
         )
-        .subcommand(SubCommand::with_name("list")
-            .about("lists active pull requests"))
+        .subcommand(SubCommand::with_name("list").about("lists active pull requests"))
         .get_matches();
 
     let config = read_config_file(matches.value_of("config").unwrap())
