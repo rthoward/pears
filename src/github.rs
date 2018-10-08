@@ -39,7 +39,7 @@ impl convert::From<serde_json::Error> for GitHubError {
 }
 
 pub trait GithubAPI {
-    fn fetch_repo(&self, config: Config, repo: &ConfigRepo) -> Result<Repo, GitHubError>;
+    fn fetch_repo(&self, config: &Config, repo: &ConfigRepo) -> Result<Repo, GitHubError>;
 }
 
 fn parse_repo_response(repo_response: String) -> Result<Repo, serde_json::Error> {
@@ -53,7 +53,7 @@ pub struct GitHubGraphqlAPI {}
 pub struct GitHubMockAPI {}
 
 impl GithubAPI for GitHubGraphqlAPI {
-    fn fetch_repo(&self, config: Config, repo: &ConfigRepo) -> Result<Repo, GitHubError> {
+    fn fetch_repo(&self, config: &Config, repo: &ConfigRepo) -> Result<Repo, GitHubError> {
         let query = r###"
         query fetchPullRequests($repo_owner: String!, $repo_name: String!) {
   repository(owner: $repo_owner, name: $repo_name) {
@@ -139,7 +139,7 @@ impl GithubAPI for GitHubGraphqlAPI {
         }).to_string();
         let mut response = reqwest::Client::new()
             .post("https://api.github.com/graphql")
-            .bearer_auth(config.token)
+            .bearer_auth(config.token.to_owned())
             .body(body)
             .send()?;
         let response_body = response.text()?;
@@ -149,7 +149,7 @@ impl GithubAPI for GitHubGraphqlAPI {
 }
 
 impl GithubAPI for GitHubMockAPI {
-    fn fetch_repo(&self, _config: Config, _repo: &ConfigRepo) -> Result<Repo, GitHubError> {
+    fn fetch_repo(&self, _config: &Config, _repo: &ConfigRepo) -> Result<Repo, GitHubError> {
         let s = r###"
         {
   "data": {
@@ -512,7 +512,7 @@ mod tests {
             owner: String::from("me"),
             name: String::from("repo"),
         };
-        let _repo = mock_api.fetch_repo(config, &repo).unwrap();
+        let _repo = mock_api.fetch_repo(&config, &repo).unwrap();
         assert!(true)
     }
 }

@@ -18,12 +18,25 @@ mod git;
 mod github;
 mod types;
 
-use clap::{App, Arg};
+use clap::{App, Arg, SubCommand};
 use config::read_config_file;
 use display::PearsDisplay;
 use git::{discover_repo, parse_repo_description};
 use github::{GitHubGraphqlAPI, GithubAPI};
 use std::env;
+use types::{Config, ConfigRepo};
+
+fn list<T: GithubAPI>(config: &Config, config_repo: &ConfigRepo, api: T, display: PearsDisplay) {
+        let repo = api.fetch_repo(config, &config_repo)
+            .expect("Could not reach GitHub API.");
+        let mut prs = repo.pull_requests;
+        prs.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
+
+        for pr in prs {
+            display.pr(pr);
+        }
+
+}
 
 fn main() {
     let matches = App::new("pears")
@@ -45,6 +58,8 @@ fn main() {
                 .help("Specify a repository. Format: <owner>/<repo>")
                 .takes_value(true),
         )
+        .subcommand(SubCommand::with_name("list")
+            .about("lists active pull requests"))
         .get_matches();
 
     let config = read_config_file(matches.value_of("config").unwrap())
@@ -60,12 +75,9 @@ fn main() {
     let display = PearsDisplay::new();
     let api = GitHubGraphqlAPI {};
 
-    let repo = api.fetch_repo(config, &config_repo)
-        .expect("Could not reach GitHub API.");
-    let mut prs = repo.pull_requests;
-    prs.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
-
-    for pr in prs {
-        display.pr(pr);
+    if let Some(_matches) = matches.subcommand_matches("list") {
+        list(&config, &config_repo, api, display);
+    } else {
+        list(&config, &config_repo, api, display);
     }
 }
