@@ -48,10 +48,26 @@ impl PearsDisplay {
         }
     }
 
-    pub fn pr(&self, pr: types::PullRequest) {
+    pub fn list(&self, prs: Vec<types::PullRequest>) {
+        let url_style = Style::new().attr(Attribute::Dim);
+
+        for pr in prs {
+            let approved = if pr.is_approved() { "✅ " } else { "   " };
+            let line = format!(
+                "{}[#{}] {}\n   Updated {} ago\n   {}\n",
+                approved,
+                pr.number,
+                pr.title,
+                ago(pr.updated_at),
+                url_style.apply_to(pr.url)
+            );
+            self.term.write_line(line.as_str()).unwrap();
+        }
+    }
+
+    pub fn show(&self, pr: types::PullRequest) {
         let url_style = Style::new().attr(Attribute::Dim);
         let approved = if pr.is_approved() { "✅ " } else { "   " };
-
         let line = format!(
             "{}[#{}] {}\n   Updated {} ago\n   {}\n",
             approved,

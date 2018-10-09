@@ -37,11 +37,7 @@ fn list<T: GithubAPI>(
         .expect("Could not reach GitHub API.");
     let mut prs = repo.pull_requests;
     prs.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
-
-    for pr in prs {
-        display.pr(pr);
-    }
-
+    display.list(prs);
     Ok(())
 }
 
@@ -62,7 +58,7 @@ fn show<T: GithubAPI>(
 
     match pr {
         Some(pr) => {
-            display.pr(pr);
+            display.show(pr);
             Ok(())
         },
         None => Err(PearsError{ details: format!("No active PR found with number {}.", number)})
