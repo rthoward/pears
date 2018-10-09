@@ -5,6 +5,7 @@ extern crate git2;
 extern crate regex;
 extern crate reqwest;
 extern crate serde;
+extern crate textwrap;
 
 #[macro_use]
 extern crate serde_derive;
@@ -60,8 +61,10 @@ fn show<T: GithubAPI>(
         Some(pr) => {
             display.show(pr);
             Ok(())
-        },
-        None => Err(PearsError{ details: format!("No active PR found with number {}.", number)})
+        }
+        None => Err(PearsError {
+            details: format!("No active PR found with number {}.", number),
+        }),
     }
 }
 
@@ -108,9 +111,13 @@ fn main() {
 
     let result = match matches.subcommand() {
         ("show", Some(matches)) => {
-            let number = matches.value_of("number").map(|n| n.parse::<i32>()).unwrap().unwrap();
+            let number = matches
+                .value_of("number")
+                .map(|n| n.parse::<i32>())
+                .unwrap()
+                .unwrap();
             show(&config, &config_repo, api, display, number)
-        },
+        }
         (_, _matches) => list(&config, &config_repo, api, display),
     };
 

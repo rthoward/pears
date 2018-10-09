@@ -1,11 +1,14 @@
 use types;
 
+use std::cmp::min;
+use std::io;
 use chrono::prelude::*;
 use console::{Attribute, Style, Term};
+use textwrap::fill;
 
 pub struct PearsDisplay {
     term: Term,
-    _width: usize,
+    width: usize,
 }
 
 fn ago(timestamp: DateTime<Utc>) -> String {
@@ -44,7 +47,7 @@ impl PearsDisplay {
 
         PearsDisplay {
             term,
-            _width: width as usize,
+            width: width as usize,
         }
     }
 
@@ -65,17 +68,40 @@ impl PearsDisplay {
         }
     }
 
-    pub fn show(&self, pr: types::PullRequest) {
+    pub fn show(&self, pr: types::PullRequest) -> io::Result<()> {
         let url_style = Style::new().attr(Attribute::Dim);
-        let approved = if pr.is_approved() { "✅ " } else { "   " };
+        let paragraph_width = min(self.width, 80);
+
+        let approved = if pr.is_approved() { "✅ " } else { " " };
         let line = format!(
-            "{}[#{}] {}\n   Updated {} ago\n   {}\n",
-            approved,
+            "[#{}] {}{}\nUpdated {} ago\n{}\n",
             pr.number,
             pr.title,
+            approved,
             ago(pr.updated_at),
             url_style.apply_to(pr.url)
         );
-        self.term.write_line(line.as_str()).unwrap();
+        self.term.write_line(line.as_str())?;
+
+        if let Some(body) = pr.body {
+            self.term.write_line("--------------------")?;
+            self.term.write_line(fill(&body, paragraph_width).as_str())?;
+            self.term.write_line("--------------------\n")?;
+        }
+
+        let mut comments = pr.comments;
+        comments.sort_by(|a, b| a.updated_at.cmp(&b.updated_at));
+
+        for comment in comments {
+            let line = format!(
+                "{}, {} ago\n   {}\n",
+                comment.author.login,
+                ago(comment.created_at),
+                fill(&comment.body_text, paragraph_width)
+            );
+            self.term.write_line(line.as_str())?;
+        }
+
+        Ok(())
     }
 }
