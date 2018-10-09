@@ -6,6 +6,11 @@ pub struct GitHubError {
     pub details: String,
 }
 
+#[derive(Debug, Clone)]
+pub struct PearsError {
+    pub details: String,
+}
+
 #[derive(Deserialize, Debug)]
 pub struct ConfigRepo {
     pub owner: String,

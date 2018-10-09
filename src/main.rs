@@ -24,9 +24,14 @@ use display::PearsDisplay;
 use git::{discover_repo, parse_repo_description};
 use github::{GitHubGraphqlAPI, GithubAPI};
 use std::env;
-use types::{Config, ConfigRepo};
+use types::{Config, ConfigRepo, PearsError};
 
-fn list<T: GithubAPI>(config: &Config, config_repo: &ConfigRepo, api: T, display: PearsDisplay) {
+fn list<T: GithubAPI>(
+    config: &Config,
+    config_repo: &ConfigRepo,
+    api: T,
+    display: PearsDisplay,
+) -> Result<(), PearsError> {
     let repo = api
         .fetch_repo(config, &config_repo)
         .expect("Could not reach GitHub API.");
@@ -35,6 +40,32 @@ fn list<T: GithubAPI>(config: &Config, config_repo: &ConfigRepo, api: T, display
 
     for pr in prs {
         display.pr(pr);
+    }
+
+    Ok(())
+}
+
+fn show<T: GithubAPI>(
+    config: &Config,
+    config_repo: &ConfigRepo,
+    api: T,
+    display: PearsDisplay,
+    number: i32,
+) -> Result<(), PearsError> {
+    let repo = api
+        .fetch_repo(config, &config_repo)
+        .expect("Could not reach GitHub API.");
+    let pr = repo
+        .pull_requests
+        .into_iter()
+        .find(|pr| pr.number == number);
+
+    match pr {
+        Some(pr) => {
+            display.pr(pr);
+            Ok(())
+        },
+        None => Err(PearsError{ details: format!("No active PR found with number {}.", number)})
     }
 }
 
@@ -59,6 +90,11 @@ fn main() {
                 .takes_value(true),
         )
         .subcommand(SubCommand::with_name("list").about("lists active pull requests"))
+        .subcommand(
+            SubCommand::with_name("show")
+                .about("details for a pull request")
+                .arg(Arg::with_name("number").required(true)),
+        )
         .get_matches();
 
     let config = read_config_file(matches.value_of("config").unwrap())
@@ -74,9 +110,16 @@ fn main() {
     let display = PearsDisplay::new();
     let api = GitHubGraphqlAPI {};
 
-    if let Some(_matches) = matches.subcommand_matches("list") {
-        list(&config, &config_repo, api, display);
-    } else {
-        list(&config, &config_repo, api, display);
-    }
+    let result = match matches.subcommand() {
+        ("show", Some(matches)) => {
+            let number = matches.value_of("number").map(|n| n.parse::<i32>()).unwrap().unwrap();
+            show(&config, &config_repo, api, display, number)
+        },
+        (_, _matches) => list(&config, &config_repo, api, display),
+    };
+
+    match result.err() {
+        Some(error) => println!("{}", error.details),
+        None => (),
+    };
 }
