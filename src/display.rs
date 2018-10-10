@@ -1,9 +1,9 @@
 use types;
 
-use std::cmp::min;
-use std::io;
 use chrono::prelude::*;
 use console::{Attribute, Style, Term};
+use std::cmp::min;
+use std::io;
 use textwrap::fill;
 
 pub struct PearsDisplay {
@@ -85,7 +85,8 @@ impl PearsDisplay {
 
         if let Some(body) = pr.body {
             self.term.write_line("--------------------")?;
-            self.term.write_line(fill(&body, paragraph_width).as_str())?;
+            self.term
+                .write_line(fill(&body, paragraph_width).as_str())?;
             self.term.write_line("--------------------\n")?;
         }
 
