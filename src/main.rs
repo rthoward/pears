@@ -59,7 +59,7 @@ fn show<T: GithubAPI>(
 
     match pr {
         Some(pr) => {
-            display.show(pr);
+            display.show(pr).unwrap();
             Ok(())
         }
         None => Err(PearsError {
