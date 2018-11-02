@@ -2,13 +2,10 @@ use types;
 
 use chrono::prelude::*;
 use console::{Attribute, Style, Term};
-use std::cmp::min;
 use std::io;
-use textwrap::fill;
 
 pub struct PearsDisplay {
     term: Term,
-    width: usize,
 }
 
 fn ago(timestamp: DateTime<Utc>) -> String {
@@ -43,11 +40,9 @@ fn ago(timestamp: DateTime<Utc>) -> String {
 impl PearsDisplay {
     pub fn new() -> PearsDisplay {
         let term = Term::stdout();
-        let (_, width) = term.size();
 
         PearsDisplay {
             term,
-            width: width as usize,
         }
     }
 
@@ -70,7 +65,6 @@ impl PearsDisplay {
 
     pub fn show(&self, pr: types::PullRequest) -> io::Result<()> {
         let url_style = Style::new().attr(Attribute::Dim);
-        let paragraph_width = min(self.width, 80);
 
         let approved = if pr.is_approved() { "✅ " } else { " " };
         let line = format!(
@@ -86,7 +80,7 @@ impl PearsDisplay {
         if let Some(body) = pr.body {
             self.term.write_line("--------------------")?;
             self.term
-                .write_line(fill(&body, paragraph_width).as_str())?;
+                .write_line(body.as_str())?;
             self.term.write_line("--------------------\n")?;
         }
 
@@ -98,7 +92,7 @@ impl PearsDisplay {
                 "{}, {} ago\n   {}\n",
                 comment.author.login,
                 ago(comment.created_at),
-                fill(&comment.body_text, paragraph_width)
+                &comment.body_text
             );
             self.term.write_line(line.as_str())?;
         }
