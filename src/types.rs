@@ -1,6 +1,5 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Deserializer};
-use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct GitHubError {
