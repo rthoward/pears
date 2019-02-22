@@ -139,21 +139,6 @@ fn main() {
         discover_repo(cwd).expect("Could not determine repo details.")
     };
 
-    // let config_repos: Vec<ConfigRepo> = match &config.groups {
-    //     Some(ref groups) => {
-    //         match matches.value_of("group") {
-    //             Some(group_name) => {
-    //                 let group = groups.iter().find(|&g| g.name == group_name).expect("Could not find group with that name. Please check your config.");
-    //                 group.repos.clone()
-    //             }
-    //             None => vec![local_repo]
-    //         }
-    //     }
-    //     None => { vec![local_repo] }
-    // };
-
-    println!("{:?}", matches);
-
     let display = PearsDisplay::new();
     let api = GitHubGraphqlAPI {};
 
@@ -172,7 +157,6 @@ fn main() {
         (_, Some(matches)) => {
             let group = matches.value_of("group");
             let repos = relevant_repos(&config, local_repo, group).unwrap();
-            println!("{:?}", repos);
             list(&config, &repos, api, display)
         }
         (_, _) => {
