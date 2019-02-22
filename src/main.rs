@@ -89,7 +89,6 @@ fn relevant_repos(config: &Config, local_repo: ConfigRepo, group: Option<&str>) 
         None => { vec![local_repo] }
     };
     Ok(config_repos)
-    // Err(PearsError { details: format!("Could not determine repos to check.") })
 }
 
 fn main() {
@@ -159,8 +158,9 @@ fn main() {
             let repos = relevant_repos(&config, local_repo, group).unwrap();
             list(&config, &repos, api, display)
         }
-        (_, _) => {
-            Err(PearsError { details: format!("Invalid invocation.") })
+        (_, None) => {
+            let repos = relevant_repos(&config, local_repo, None).unwrap();
+            list(&config, &repos, api, display)
         }
     };
 
