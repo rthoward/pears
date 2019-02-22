@@ -94,7 +94,7 @@ fn relevant_repos(config: &Config, local_repo: ConfigRepo, group: Option<&str>) 
 
 fn main() {
     let matches = App::new("pears")
-        .version("0.1")
+        .version("1.2.1")
         .author("Richard Howard <richard@howard.io>")
         .arg(
             Arg::with_name("config")
@@ -124,7 +124,7 @@ fn main() {
                 .arg(Arg::with_name("group").required(false).index(2)),
         )
         .subcommand(
-            SubCommand::with_name("config.show")
+            SubCommand::with_name("config")
                 .about("Show config")
         )
         .get_matches();
@@ -153,7 +153,7 @@ fn main() {
             let repos = relevant_repos(&config, local_repo, group).unwrap();
             show(&config, &repos, api, display, number)
         }
-        ("config.show", _matches) => { show_config(&config) }
+        ("config", _matches) => { show_config(&config) }
         (_, Some(matches)) => {
             let group = matches.value_of("group");
             let repos = relevant_repos(&config, local_repo, group).unwrap();
