@@ -119,8 +119,8 @@ fn main() {
         .subcommand(
             SubCommand::with_name("show")
                 .about("details for a pull request")
-                .arg(Arg::with_name("number").required(true))
-                .arg(Arg::with_name("group").required(false).index(2)),
+                .arg(Arg::with_name("number").required(true).index(2))
+                .arg(Arg::with_name("group").required(false).index(1)),
         )
         .subcommand(
             SubCommand::with_name("config")
