@@ -77,17 +77,20 @@ impl PearsDisplay {
 
     pub fn show(&self, pr: types::PullRequest) -> io::Result<()> {
         let url_style = Style::new().attr(Attribute::Dim);
+        let number_style = Style::new().green();
+        let label_style = Style::new().cyan();
 
-        let approved = if pr.is_approved() { "✅ " } else { " " };
+        let label_str = pr.labels.iter().map(|l| format!("[{}]", l.name)).collect::<Vec<String>>().join(" ");
         let line = format!(
-            "[#{}] {}{}\nUpdated {} ago\n{}\n",
-            pr.number,
+            "{} {} {}\nOpened by {} | Updated {} ago\n{}\n",
+            number_style.apply_to(format!("#{}", pr.number)),
             pr.title,
-            approved,
+            label_style.apply_to(label_str),
+            pr.author.login,
             ago(pr.updated_at),
             url_style.apply_to(pr.url)
         );
-        self.term.write_line(line.as_str())?;
+        self.term.write_line(line.as_str()).unwrap();
 
         if let Some(body) = pr.body {
             self.term.write_line("--------------------")?;
