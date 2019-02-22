@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Deserializer};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct GitHubError {
@@ -11,16 +12,23 @@ pub struct PearsError {
     pub details: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct ConfigRepo {
     pub owner: String,
     pub name: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct Config {
     pub me: String,
     pub token: String,
+    pub groups: Option<Vec<Group>>
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct Group {
+    pub name: String,
+    pub repos: Vec<ConfigRepo>
 }
 
 #[derive(Deserialize, Debug)]
