@@ -28,43 +28,68 @@ use types::{Config, ConfigRepo, PearsError};
 
 fn list<T: GithubAPI>(
     config: &Config,
-    config_repo: &ConfigRepo,
+    config_repos: &Vec<ConfigRepo>,
     api: T,
     display: PearsDisplay,
 ) -> Result<(), PearsError> {
-    let repo = api
-        .fetch_repo(config, &config_repo)
-        .expect("Could not reach GitHub API.");
-    let mut prs = repo.pull_requests;
-    prs.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
-    display.list(prs);
+    for config_repo in config_repos {
+        let repo = api
+            .fetch_repo(config, &config_repo)
+            .expect("Could not reach GitHub API.");
+        let mut prs = repo.pull_requests;
+        prs.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
+        display.repo(config_repo);
+        display.list(prs);
+    }
     Ok(())
 }
 
 fn show<T: GithubAPI>(
     config: &Config,
-    config_repo: &ConfigRepo,
+    config_repos: &Vec<ConfigRepo>,
     api: T,
     display: PearsDisplay,
     number: i32,
 ) -> Result<(), PearsError> {
-    let repo = api
-        .fetch_repo(config, &config_repo)
-        .expect("Could not reach GitHub API.");
-    let pr = repo
-        .pull_requests
-        .into_iter()
-        .find(|pr| pr.number == number);
-
-    match pr {
-        Some(pr) => {
-            display.show(pr).unwrap();
-            Ok(())
+    for config_repo in config_repos {
+        let repo = api
+            .fetch_repo(config, &config_repo)
+            .expect("Could not reach GitHub API.");
+        let pr = repo
+            .pull_requests
+            .into_iter()
+            .find(|pr| pr.number == number);
+        match pr {
+            Some(pr) => {
+                display.show(pr).unwrap();
+                return Ok(())
+            }
+            None => { () }
         }
-        None => Err(PearsError {
-            details: format!("No active PR found with number {}.", number),
-        }),
     }
+    Err(PearsError { details: format!("No active PR found with number {}.", number), })
+}
+
+fn show_config(config: &Config) -> Result<(), PearsError> {
+    println!("{:?}", config);
+    Ok(())
+}
+
+fn relevant_repos(config: &Config, local_repo: ConfigRepo, group: Option<&str>) -> Result<Vec<ConfigRepo>, PearsError> {
+    let config_repos: Vec<ConfigRepo> = match &config.groups {
+        Some(ref groups) => {
+            match group {
+                Some(group_name) => {
+                    let group = groups.iter().find(|&g| g.name == group_name).expect("Could not find group with that name. Please check your config.");
+                    group.repos.clone()
+                }
+                None => vec![local_repo]
+            }
+        }
+        None => { vec![local_repo] }
+    };
+    Ok(config_repos)
+    // Err(PearsError { details: format!("Could not determine repos to check.") })
 }
 
 fn main() {
@@ -87,18 +112,27 @@ fn main() {
                 .help("Specify a repository. Format: <owner>/<repo>")
                 .takes_value(true),
         )
-        .subcommand(SubCommand::with_name("list").about("lists active pull requests"))
+        .subcommand(
+            SubCommand::with_name("list")
+            .about("lists active pull requests")
+            .arg(Arg::with_name("group").required(false).index(1))
+        )
         .subcommand(
             SubCommand::with_name("show")
                 .about("details for a pull request")
-                .arg(Arg::with_name("number").required(true)),
+                .arg(Arg::with_name("number").required(true))
+                .arg(Arg::with_name("group").required(false).index(2)),
+        )
+        .subcommand(
+            SubCommand::with_name("config.show")
+                .about("Show config")
         )
         .get_matches();
 
     let config = read_config_file(matches.value_of("config").unwrap())
         .expect("Could not parse config file.");
 
-    let config_repo = if matches.is_present("repo") {
+    let local_repo = if matches.is_present("repo") {
         parse_repo_description(matches.value_of("repo").unwrap())
     } else {
         let cwd = env::current_dir().expect("Could not get current dir.");
@@ -115,9 +149,19 @@ fn main() {
                 .map(|n| n.parse::<i32>())
                 .unwrap()
                 .unwrap();
-            show(&config, &config_repo, api, display, number)
+            let group = matches.value_of("group");
+            let repos = relevant_repos(&config, local_repo, group).unwrap();
+            show(&config, &repos, api, display, number)
         }
-        (_, _matches) => list(&config, &config_repo, api, display),
+        ("config.show", _matches) => { show_config(&config) }
+        (_, Some(matches)) => {
+            let group = matches.value_of("group");
+            let repos = relevant_repos(&config, local_repo, group).unwrap();
+            list(&config, &repos, api, display)
+        }
+        (_, _) => {
+            Err(PearsError { details: format!("Invalid invocation.") })
+        }
     };
 
     match result.err() {
