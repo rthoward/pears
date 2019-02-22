@@ -93,7 +93,7 @@ fn relevant_repos(config: &Config, local_repo: ConfigRepo, group: Option<&str>) 
 
 fn main() {
     let matches = App::new("pears")
-        .version("1.2.2")
+        .version("1.2.3")
         .author("Richard Howard <richard@howard.io>")
         .arg(
             Arg::with_name("config")
