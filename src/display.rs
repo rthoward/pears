@@ -54,14 +54,20 @@ impl PearsDisplay {
 
     pub fn list(&self, prs: Vec<types::PullRequest>) {
         let url_style = Style::new().attr(Attribute::Dim);
+        let number_style = Style::new().green();
+        let label_style = Style::new().cyan();
 
         for pr in prs {
+            let label_str = pr.labels.iter().map(|l| format!("[{}]", l.name)).collect::<Vec<String>>().join(" ");
+
             let approved = if pr.is_approved() { "✅ " } else { "   " };
             let line = format!(
-                "{}[#{}] {}\n   Updated {} ago\n   {}\n",
+                "{}{} {} {}\n   Opened by {} | Updated {} ago\n   {}\n",
                 approved,
-                pr.number,
+                number_style.apply_to(format!("#{}", pr.number)),
                 pr.title,
+                label_style.apply_to(label_str),
+                pr.author.login,
                 ago(pr.updated_at),
                 url_style.apply_to(pr.url)
             );
