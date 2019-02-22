@@ -1,7 +1,7 @@
 use types;
 
 use chrono::prelude::*;
-use console::{Attribute, Style, Term};
+use console::{Attribute, Style, Term, Color};
 use std::io;
 
 pub struct PearsDisplay {
@@ -44,6 +44,12 @@ impl PearsDisplay {
         PearsDisplay {
             term,
         }
+    }
+
+    pub fn repo(&self, repo: &types::ConfigRepo) {
+        let repo_style = Style::new().bg(Color::White).fg(Color::Black);
+        let line = format!("{:80}\n", repo_style.apply_to(&repo.name));
+        self.term.write_line(line.as_str()).unwrap();
     }
 
     pub fn list(&self, prs: Vec<types::PullRequest>) {

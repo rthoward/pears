@@ -38,6 +38,7 @@ fn list<T: GithubAPI>(
             .expect("Could not reach GitHub API.");
         let mut prs = repo.pull_requests;
         prs.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
+        display.repo(config_repo);
         display.list(prs);
     }
     Ok(())
