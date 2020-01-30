@@ -1,6 +1,6 @@
 [package]
 name = "pears"
-version = "1.2.3"
+version = "1.2.4"
 authors = ["Richard Howard <richard@howard.io>"]
 description = "A simple tool for viewing open pull requests."
 license = "MIT"

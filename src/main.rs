@@ -24,11 +24,12 @@ use display::PearsDisplay;
 use git::{discover_repo, parse_repo_description};
 use github::{GitHubGraphqlAPI, GithubAPI};
 use std::env;
-use types::{Config, ConfigRepo, PearsError};
+use types::{Config, ConfigRepo, PearsError, PullRequest};
 
 fn list<T: GithubAPI>(
     config: &Config,
     config_repos: &Vec<ConfigRepo>,
+    only_me: bool,
     api: T,
     display: PearsDisplay,
 ) -> Result<(), PearsError> {
@@ -36,7 +37,7 @@ fn list<T: GithubAPI>(
         let repo = api
             .fetch_repo(config, &config_repo)
             .expect("Could not reach GitHub API.");
-        let mut prs = repo.pull_requests;
+        let mut prs: Vec<&PullRequest> = repo.pull_requests.iter().filter(|pr| !only_me || pr.author.login == config.me).collect();
         prs.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
         display.repo(config_repo);
         display.list(prs);
@@ -111,6 +112,12 @@ fn main() {
                 .help("Specify a repository. Format: <owner>/<repo>")
                 .takes_value(true),
         )
+        .arg(
+            Arg::with_name("mine")
+                .short("m")
+                .long("mine")
+                .help("Show only pull requests authored by me.")
+        )
         .subcommand(
             SubCommand::with_name("list")
             .about("lists active pull requests")
@@ -137,6 +144,7 @@ fn main() {
         let cwd = env::current_dir().expect("Could not get current dir.");
         discover_repo(cwd).expect("Could not determine repo details.")
     };
+    let only_me = matches.occurrences_of("mine") > 0;
 
     let display = PearsDisplay::new();
     let api = GitHubGraphqlAPI {};
@@ -156,11 +164,11 @@ fn main() {
         (_, Some(matches)) => {
             let group = matches.value_of("group");
             let repos = relevant_repos(&config, local_repo, group).unwrap();
-            list(&config, &repos, api, display)
+            list(&config, &repos, only_me, api, display)
         }
         (_, None) => {
             let repos = relevant_repos(&config, local_repo, None).unwrap();
-            list(&config, &repos, api, display)
+            list(&config, &repos, only_me, api, display)
         }
     };
 

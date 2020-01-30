@@ -52,7 +52,7 @@ impl PearsDisplay {
         self.term.write_line(line.as_str()).unwrap();
     }
 
-    pub fn list(&self, prs: Vec<types::PullRequest>) {
+    pub fn list(&self, prs: Vec<&types::PullRequest>) {
         let url_style = Style::new().attr(Attribute::Dim);
         let number_style = Style::new().green();
         let label_style = Style::new().cyan();
@@ -69,7 +69,7 @@ impl PearsDisplay {
                 label_style.apply_to(label_str),
                 pr.author.login,
                 ago(pr.updated_at),
-                url_style.apply_to(pr.url)
+                url_style.apply_to(&pr.url)
             );
             self.term.write_line(line.as_str()).unwrap();
         }
