@@ -1,7 +1,7 @@
 use types;
 
 use chrono::prelude::*;
-use console::{Attribute, Style, Term, Color};
+use console::{Attribute, Color, Style, Term};
 use std::io;
 
 pub struct PearsDisplay {
@@ -41,9 +41,7 @@ impl PearsDisplay {
     pub fn new() -> PearsDisplay {
         let term = Term::stdout();
 
-        PearsDisplay {
-            term,
-        }
+        PearsDisplay { term }
     }
 
     pub fn repo(&self, repo: &types::ConfigRepo) {
@@ -58,7 +56,12 @@ impl PearsDisplay {
         let label_style = Style::new().cyan();
 
         for pr in prs {
-            let label_str = pr.labels.iter().map(|l| format!("[{}]", l.name)).collect::<Vec<String>>().join(" ");
+            let label_str = pr
+                .labels
+                .iter()
+                .map(|l| format!("[{}]", l.name))
+                .collect::<Vec<String>>()
+                .join(" ");
 
             let approved = if pr.is_approved() { "✅ " } else { "   " };
             let line = format!(
@@ -80,7 +83,12 @@ impl PearsDisplay {
         let number_style = Style::new().green();
         let label_style = Style::new().cyan();
 
-        let label_str = pr.labels.iter().map(|l| format!("[{}]", l.name)).collect::<Vec<String>>().join(" ");
+        let label_str = pr
+            .labels
+            .iter()
+            .map(|l| format!("[{}]", l.name))
+            .collect::<Vec<String>>()
+            .join(" ");
         let line = format!(
             "{} {} {}\nOpened by {} | Updated {} ago\n{}\n",
             number_style.apply_to(format!("#{}", pr.number)),
@@ -94,8 +102,7 @@ impl PearsDisplay {
 
         if let Some(body) = pr.body {
             self.term.write_line("--------------------")?;
-            self.term
-                .write_line(body.as_str())?;
+            self.term.write_line(body.as_str())?;
             self.term.write_line("--------------------\n")?;
         }
 

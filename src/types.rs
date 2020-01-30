@@ -21,13 +21,13 @@ pub struct ConfigRepo {
 pub struct Config {
     pub me: String,
     pub token: String,
-    pub groups: Option<Vec<Group>>
+    pub groups: Option<Vec<Group>>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct Group {
     pub name: String,
-    pub repos: Vec<ConfigRepo>
+    pub repos: Vec<ConfigRepo>,
 }
 
 #[derive(Deserialize, Debug)]

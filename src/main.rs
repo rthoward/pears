@@ -37,7 +37,11 @@ fn list<T: GithubAPI>(
         let repo = api
             .fetch_repo(config, &config_repo)
             .expect("Could not reach GitHub API.");
-        let mut prs: Vec<&PullRequest> = repo.pull_requests.iter().filter(|pr| !only_me || pr.author.login == config.me).collect();
+        let mut prs: Vec<&PullRequest> = repo
+            .pull_requests
+            .iter()
+            .filter(|pr| !only_me || pr.author.login == config.me)
+            .collect();
         prs.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
         display.repo(config_repo);
         display.list(prs);
@@ -63,12 +67,14 @@ fn show<T: GithubAPI>(
         match pr {
             Some(pr) => {
                 display.show(pr).unwrap();
-                return Ok(())
+                return Ok(());
             }
-            None => { () }
+            None => (),
         }
     }
-    Err(PearsError { details: format!("No active PR found with number {}.", number), })
+    Err(PearsError {
+        details: format!("No active PR found with number {}.", number),
+    })
 }
 
 fn show_config(config: &Config) -> Result<(), PearsError> {
@@ -76,18 +82,23 @@ fn show_config(config: &Config) -> Result<(), PearsError> {
     Ok(())
 }
 
-fn relevant_repos(config: &Config, local_repo: ConfigRepo, group: Option<&str>) -> Result<Vec<ConfigRepo>, PearsError> {
+fn relevant_repos(
+    config: &Config,
+    local_repo: ConfigRepo,
+    group: Option<&str>,
+) -> Result<Vec<ConfigRepo>, PearsError> {
     let config_repos: Vec<ConfigRepo> = match &config.groups {
-        Some(ref groups) => {
-            match group {
-                Some(group_name) => {
-                    let group = groups.iter().find(|&g| g.name == group_name).expect("Could not find group with that name. Please check your config.");
-                    group.repos.clone()
-                }
-                None => vec![local_repo]
+        Some(ref groups) => match group {
+            Some(group_name) => {
+                let group = groups
+                    .iter()
+                    .find(|&g| g.name == group_name)
+                    .expect("Could not find group with that name. Please check your config.");
+                group.repos.clone()
             }
-        }
-        None => { vec![local_repo] }
+            None => vec![local_repo],
+        },
+        None => vec![local_repo],
     };
     Ok(config_repos)
 }
@@ -116,12 +127,12 @@ fn main() {
             Arg::with_name("mine")
                 .short("m")
                 .long("mine")
-                .help("Show only pull requests authored by me.")
+                .help("Show only pull requests authored by me."),
         )
         .subcommand(
             SubCommand::with_name("list")
-            .about("lists active pull requests")
-            .arg(Arg::with_name("group").required(false).index(1))
+                .about("lists active pull requests")
+                .arg(Arg::with_name("group").required(false).index(1)),
         )
         .subcommand(
             SubCommand::with_name("show")
@@ -129,10 +140,7 @@ fn main() {
                 .arg(Arg::with_name("number").required(true).index(2))
                 .arg(Arg::with_name("group").required(false).index(1)),
         )
-        .subcommand(
-            SubCommand::with_name("config")
-                .about("Show config")
-        )
+        .subcommand(SubCommand::with_name("config").about("Show config"))
         .get_matches();
 
     let config = read_config_file(matches.value_of("config").unwrap())
@@ -160,7 +168,7 @@ fn main() {
             let repos = relevant_repos(&config, local_repo, group).unwrap();
             show(&config, &repos, api, display, number)
         }
-        ("config", _matches) => { show_config(&config) }
+        ("config", _matches) => show_config(&config),
         (_, Some(matches)) => {
             let group = matches.value_of("group");
             let repos = relevant_repos(&config, local_repo, group).unwrap();
