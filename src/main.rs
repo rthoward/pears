@@ -105,7 +105,7 @@ fn relevant_repos(
 
 fn main() {
     let matches = App::new("pears")
-        .version("1.2.3")
+        .version("1.2.5")
         .author("Richard Howard <richard@howard.io>")
         .arg(
             Arg::with_name("config")
